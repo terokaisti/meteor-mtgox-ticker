@@ -1,8 +1,4 @@
 Chat = new Meteor.Collection('chat');
-MtGoxClient = function(key, secret) {
-        this.key = key;
-        this.secret = secret;
-};
 
 if (Meteor.isClient) {
 	Template.chat.list = function() {

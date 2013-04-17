@@ -4,6 +4,11 @@ if (Meteor.isServer) {
 	        https = require('https'),
 	        crypto = require('crypto');
 
+	MtGoxClient = function(key, secret) {
+		this.key = key;
+		this.secret = secret;
+	};
+
 	MtGoxClient.prototype.query = function(path, args, callback) {
 	        var client = this;
 
@@ -69,8 +74,8 @@ if (Meteor.isServer) {
 		*/
 		Fiber = Npm.require('fibers');
 		var client = new MtGoxClient(
-			'cb009506-3088-4a03-ad82-685e8002eee3', 
-			'1qeHdsEI1louBFbcamJjrz5XkMQHX6nzZITsO331mJncgPGI0vnJpGPdzZVjZ1tMzr7rM9VSr90EknLV5wZEJQ=='
+			Meteor.settings.MtGoxApi.key, 
+			Meteor.settings.MtGoxApi.secret
 		);
 		var updateMtGox = function() {
 			client.query('1/BTCUSD/public/ticker', {}, function(json) {
