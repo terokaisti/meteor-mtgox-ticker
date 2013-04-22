@@ -1,0 +1,27 @@
+<head>
+  <title>Mt Gox ticker</title>
+</head>
+
+<body>
+	{{> messages}}
+
+	{{> trades}}
+	
+	<div id="graph"></div>
+</body>
+
+<template name="messages">
+	{{value}}
+</template>
+
+<template name="trades">
+	<ul>
+	{{#each list}}
+		{{> entry}}
+	{{/each}}
+	</ul>
+</template>
+
+<template name="entry">
+	<li>{{value}}</li>
+</template>
