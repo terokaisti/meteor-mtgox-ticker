@@ -13,8 +13,9 @@ if (Meteor.isServer) {
 
 		var responseMessage = function() {
 			output = [].join.call(arguments, " ");
+			console.log(output);
 			Fiber(function() {
-				Messages.update(messagesId, {value: output, time: new Date().toString()});
+				Messages.update(messagesId, {value: output});
 			}).run();
 		};
 		
@@ -32,154 +33,152 @@ if (Meteor.isServer) {
 		});
 
 		client.on('subscribe', function(message) {
-		  renderSubscribeMessage(message);
+			renderSubscribeMessage(message);
 		});
 
 		client.on('unsubscribe', function(message) {
-		  renderUnsubscribeMessage(message);
+			renderUnsubscribeMessage(message);
 		});
 
 		client.on('trade', function(message) {
-		  renderTradeMessage(message, lastTradePrice);
-		  lastTradePrice = message.trade.price;
+			renderTradeMessage(message, lastTradePrice);
+			lastTradePrice = message.trade.price;
 		});
 
 		client.on('depth', function(message) {
-		  renderDepthMessage(message);
+			renderDepthMessage(message);
 		});
 
 		client.on('ticker', function(message) {
-		  renderTickerMessage(message, lastTickerPrice);
-		  lastTickerPrice = message.ticker.last;
-		  lastTickerVolume = message.ticker.vol;
+			renderTickerMessage(message, lastTickerPrice);
+			lastTickerPrice = message.ticker.last;
+			lastTickerVolume = message.ticker.vol;
 		});
 
 		process.on('exit', function() {
-		  responseMessage('Goodbye!');
-		  client.close();
+			responseMessage('Goodbye!');
+			client.close();
 		});
 		
 		var renderSubscribeMessage = function(message) {
-		  var format = 'Subscribed to channel:';
-		  responseMessage(getTimeFormat(), format, getChannelFormat(message));
+			var format = 'Subscribed to channel:';
+			responseMessage(getTimeFormat(), format, getChannelFormat(message));
 		};
 
 		var renderUnsubscribeMessage = function(message) {
-		  var format = 'Unsubscribed from channel:';
-		  responseMessage(getTimeFormat(), format, getChannelFormat(message));
+			var format = 'Unsubscribed from channel:';
+			responseMessage(getTimeFormat(), format, getChannelFormat(message));
 		};
 
 		var renderTradeMessage = function(message, lastPrice) {
-		  responseMessage(getTimeFormat(), getTradeFormat(message.trade, lastPrice));
+			responseMessage(getTimeFormat(), getTradeFormat(message.trade, lastPrice));
 		};
 
 		var renderTickerMessage = function(message, lastPrice) {
-		  responseMessage(getTimeFormat(), getTickerFormat(message.ticker, lastPrice));
+			responseMessage(getTimeFormat(), getTickerFormat(message.ticker, lastPrice));
 		};
 
 		var renderDepthMessage = function(message) {
-		  responseMessage(getTimeFormat(), getDepthFormat(message.depth));
+			responseMessage(getTimeFormat(), getDepthFormat(message.depth));
 		};
 		
 	});
 
 	var getDepthFormat = function(depth) {
-	  var format = '';
+		var format = '';
 
-	  if (depth.volume < 0) {
-	    format += '+ ';
-	  }
-	  else {
-	    format += '- ';
-	  };
+		if (depth.volume < 0) {
+			format += '+ ';
+		}
+		else {
+			format += '- ';
+		};
 
-	  if (depth.type_str == 'ask') {
-	    format += 'Ask: ';
-	  }
-	  else if (depth.type_str = 'bid') {
-	    format += 'Bid: ';
-	  }
+		if (depth.type_str == 'ask') {
+			format += 'Ask: ';
+		}
+		else if (depth.type_str = 'bid') {
+			format += 'Bid: ';
+		}
 
-	  var amount = Math.abs(depth.volume);
-	  var price = Math.abs(depth.price);
+		var amount = Math.abs(depth.volume);
+		var price = Math.abs(depth.price);
 
-	  format += (amount + ' ' + depth.item) + ' @ ';
-	  format += getPriceFormat(price, price, depth.currency);
+		format += (amount + ' ' + depth.item) + ' @ ';
+		format += getPriceFormat(price, price, depth.currency);
 
-	  return format;
+		return format;
 	};
 
 	var getTickerFormat = function(ticker, lastPrice) {
-	  var format = '> ';
+		var format = '> ';
 
-	  var last = 'Last: ';
-	  var high = 'High: ';
-	  var low = 'Low: ';
-	  var vol = 'Vol: ';
-	  var avg = 'Avg: ';
+		var last = 'Last: ';
+		var high = 'High: ';
+		var low = 'Low: ';
+		var vol = 'Vol: ';
+		var avg = 'Avg: ';
 
-	  last += getPriceFormat(ticker.last.display, lastPrice);
-	  high += ticker.high.display;
-	  low += ticker.low.display;
-	  vol += ticker.vol.display;
-	  avg += ticker.vwap.display;
+		last += getPriceFormat(ticker.last.display, lastPrice);
+		high += ticker.high.display;
+		low += ticker.low.display;
+		vol += ticker.vol.display;
+		avg += ticker.vwap.display;
 
-	  return format + [vol, high, low, avg, last].join(' ');
+		return format + [vol, high, low, avg, last].join(' ');
 	};
 
 	var getTradeFormat = function(trade, lastPrice) {
-	  var format = '$ ';
+		var format = '$ ';
 
-	  if (trade.trade_type == 'ask') {
-	    format += 'Ask: ';
-	  }
-	  else if (trade.trade_type == 'bid') {
-	    format += 'Bid: ';
-	  }
-
-	  format += (trade.amount + ' ' + trade.item) + ' @ ';
-	  format += getPriceFormat(trade.price, lastPrice, trade.price_currency);
-
-	Fiber(function() {
-		if (trade.price_currency == 'USD') {
-			Trades.insert({value: trade.price, time: new Date().getTime()});
+		if (trade.trade_type == 'ask') {
+			format += 'Ask: ';
 		}
-	}).run();
+		else if (trade.trade_type == 'bid') {
+			format += 'Bid: ';
+		}
+		format += (trade.amount + ' ' + trade.item) + ' @ ';
+		format += getPriceFormat(trade.price, lastPrice, trade.price_currency);
+console.log('foo');
+		Fiber(function() {
+			if (trade.price_currency == 'USD') {
+				Trades.insert({value: trade.price, time: new Date().getTime()});
+			}
+		}).run();
 
-
-	  return format;
+		return format;
 	};
 
 	var getChannelFormat = function(message) {
-	  var channel = mtgox.getChannel(message.channel)||message.channel;
-	  return channel.name;
+		var channel = mtgox.getChannel(message.channel)||message.channel;
+		return channel.name;
 	};
 
 	var getTimeFormat = function() {
-	  var now = new Date();
-	  var time = '[' + datetime.format(now, '%T') + ']';
-	  return time;
+		var now = new Date();
+		var time = '[' + datetime.format(now, '%T') + ']';
+		return time;
 	};
 
 	var getPriceFormat = function(currentPrice, lastPrice, currency) {
-	  var format = currentPrice + (currency ? ' ' + currency : '');
-	  if (lastPrice < 0) {
-	    return format;
-	  }
+		var format = currentPrice + (currency ? ' ' + currency : '');
+		if (lastPrice < 0) {
+			return format;
+	  	}
 
-	  var delta = lastPrice - currentPrice;
-	  var percent = (lastPrice > 0) ? (delta / lastPrice) * 100 : 100;
-	  var round = function(n) {
-	    return Math.round(Math.abs(n) * 100) / 100;
-	  };
+		var delta = lastPrice - currentPrice;
+		var percent = (lastPrice > 0) ? (delta / lastPrice) * 100 : 100;
+		var round = function(n) {
+			return Math.round(Math.abs(n) * 100) / 100;
+		};
 
-	  if (delta > 0) {
-	    format += (' +' + round(delta) + ' +' + round(percent) + '%');
-	  }
-	  else if (delta < 0) {
-	    format += (' -' + round(delta) + ' -' +round( percent) + '%');
-	  }
+		if (delta > 0) {
+			format += (' +' + round(delta) + ' +' + round(percent) + '%');
+		}
+		else if (delta < 0) {
+			format += (' -' + round(delta) + ' -' +round( percent) + '%');
+		}
 
-	  return format;
+		return format;
 	};
 }
