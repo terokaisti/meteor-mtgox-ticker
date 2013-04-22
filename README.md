@@ -1,3 +1,1 @@
 Under construction...
-
-Run: meteor --settings settings.json
