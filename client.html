@@ -3,12 +3,18 @@
 </head>
 
 <body>
+	{{> graph}}
+	
 	{{> messages}}
 
 	{{> trades}}
-	
-	<div id="graph"></div>
 </body>
+
+<template name="graph">
+	{{#constant}}
+	<div id="graph"></div>
+	{{/constant}}
+</template>
 
 <template name="messages">
 	Value: {{value}}

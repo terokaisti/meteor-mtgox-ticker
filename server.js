@@ -139,7 +139,7 @@ if (Meteor.isServer) {
 		}
 		format += (trade.amount + ' ' + trade.item) + ' @ ';
 		format += getPriceFormat(trade.price, lastPrice, trade.price_currency);
-console.log('foo');
+
 		Fiber(function() {
 			if (trade.price_currency == 'USD') {
 				Trades.insert({value: trade.price, time: new Date().getTime()});
